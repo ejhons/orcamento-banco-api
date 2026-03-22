@@ -7,9 +7,9 @@ from extensions import db
 # from main import db
 # import services  # import get_composicoes, get_composicoes_by_codigo, cria_composicao, altera_composicao, remover_composicao
 # app = Flask(__name__)
-# dummy
-# Rota padrão
+
 composicao_rotas = Blueprint('composicao_rotas', __name__)
+# Rota padrão
 
 
 @composicao_rotas.route('/')
@@ -49,32 +49,28 @@ def obter_composicao(codigo: int):
     # return jsonify(services.get_composicoes_by_codigo(codigo))
 
 
+# @composicao_rotas.route('/composicoes/adicionar', methods=['POST'])
+# def criar_composicao():
+#     # composicao = request.get_json()
+#     # services.cria_composicao(composicao)
+#     # return jsonify(composicao, 200)
+
+#     nova_composicao = request.get_json()
+#     composicao = Composicao(
+#         codigo=nova_composicao['codigo'],
+#         descricao=nova_composicao['descricao'],
+#         grupo=nova_composicao['grupo'],
+#         custo_unitario=nova_composicao['custo_unitario'],
+#         unidade=nova_composicao['unidade']
+#     )
+#     db.session.add(composicao)
+#     db.session.commit()
+
+#     return jsonify({'mensagem': f'{composicao.codigo} criada com sucesso!'}, 200)
+
+
 @composicao_rotas.route('/composicoes/adicionar', methods=['POST'])
-def criar_composicao():
-    # composicao = request.get_json()
-    # services.cria_composicao(composicao)
-    # return jsonify(composicao, 200)
-
-    nova_composicao = request.get_json()
-    composicao = Composicao(
-        codigo=nova_composicao['codigo'],
-        descricao=nova_composicao['descricao'],
-        grupo=nova_composicao['grupo'],
-        custo_unitario=nova_composicao['custo_unitario'],
-        unidade=nova_composicao['unidade']
-    )
-    db.session.add(composicao)
-    db.session.commit()
-
-    return jsonify({'mensagem': f'{composicao.codigo} criada com sucesso!'}, 200)
-
-
-@composicao_rotas.route('/composicoes/adicionar_varias', methods=['POST'])
 def criar_composicoes():
-    # composicao = request.get_json()
-    # services.cria_composicao(composicao)
-    # return jsonify(composicao, 200)
-
     composicoes = request.get_json()['composicoes']
     for nova_composicao in composicoes:
         try:
@@ -134,10 +130,3 @@ def excluir_composicao(codigo):
     db.session.commit()
 
     return jsonify({'mensagem': f'{codigo} excluído com sucesso!'}, 200)
-
-
-# Recursos disponibilizados pela API
-
-# Verbos a serem disponibilizados: GET, POST, PUT, DELETE
-
-# URLs completos de cada um

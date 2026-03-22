@@ -1,23 +1,49 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from extensions import db
-# Definir estrutra da tabela de composições
-# codigo, descricao, grupo, custo_unitario, unidade
 
 
 class Composicao(db.Model):
+    '''
+    Tabela principal de composições.
+    columns = [codigo, descricao, grupo, custo_unitario, unidade]
+    TODO: Implementar colunas de informação da fonte.
+    '''
     __tablename__ = 'composicoes'
     codigo = db.Column(db.Integer, primary_key=True)
-    descricao = db.Column(db.String)
-    grupo = db.Column(db.String)
-    custo_unitario = db.Column(db.Float)
-    unidade = db.Column(db.String)
+    descricao = db.Column(db.String, nullable=False)
+    grupo = db.Column(db.String, nullable=False)
+    custo_unitario = db.Column(db.Float, nullable=False)
+    unidade = db.Column(db.String, nullable=False)
+    coeficiente = db.Column(db.Float, default=1.0)
 
     composicoes = db.relationship('Subcomposicao')
 
 
 class Subcomposicao(db.Model):
-    __tableaname__ = 'subcomposicoes'
-    codigo = db.Column(db.Integer, primary_key=True)
+    '''
+    Tabela de subcomposições utilizadas no detalhamento do orçamento quanto à composição do custo.
+    [codigo_subcomposicao*,codigo_composicao_mae*,coeficiente,custo_unitario**,unidade**]
+    As colunas de código marcadas com * precisarão funcionar como uma dupla chave que ainda preciso ver como fazer. 
+    As colunas de custo_unitario e unidade (marcadas com **) são dispensáveis já que sua existência causaria
+    ambiguidade/duplicidade de informações.
+    '''
+    __tablename__ = 'subcomposicoes'
     # db.ForeignKey('nome_tabela.coluna')
-    id_composicao = db.Column(db.Integer, db.ForeignKey('composicoes.codigo'))
+    codigo = db.Column(db.Integer, db.ForeignKey(
+        'composicoes.codigo'), primary_key=True)
+    id_composicao = db.Column(db.Integer, db.ForeignKey(
+        'composicoes.codigo'), primary_key=True)
+    coeficiente = db.Column(db.Float, nullable=False)
+
+
+class Usuario(db.Model):
+    '''
+    Tabela de usuário para acesso à informação da API. 
+    A ser usado apenas para garantir que nenhum usuário poderá alterar o banco de dados de forma arbitrária
+    '''
+    __tablename__ = 'usuarios'
+    id = db.Column(db.Integer, primary_key=True, auto_increment=True)
+    email = db.Column(db.String)
+    password = db.Column(db.String)
+    admin = db.Column(db.Boolean, default=False)

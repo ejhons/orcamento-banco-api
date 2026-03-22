@@ -1,13 +1,16 @@
 # Flask para criar API's
 # Tradicional ou Restfull
 # pip install flask
-from flask import Flask, jsonify, request
+from flask import Blueprint, jsonify, request
+from main import app
+from extensions import db
 import services  # import get_composicoes, get_composicoes_by_codigo, cria_composicao, altera_composicao, remover_composicao
-app = Flask(__name__)
+
 # dummy
 # Definir o objetivo da APIS: consultar, editar, criar e exluir composições em um banco de dados
 
 # URL base
+composicao_rotas = Blueprint('composicao_rotas', __name__)
 
 # Rota padrão
 
