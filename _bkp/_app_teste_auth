@@ -1,0 +1,10 @@
+from requests.auth import HTTPBasicAuth
+import requests
+
+resultado = requests.get('http://localhost:500/login',
+                         auth=('jhons', '123456'))
+print(resultado.json())
+
+resultado_autores = requests.get(
+    'http://localhost:500/autores', headers={'x-access-token': resultado.json()['token']})
+print(print(resultado_autores.json()))
