@@ -85,7 +85,7 @@ def cria_composicoes(composicoes):
     Adiciona uma lista de composições ao banco de dados.
     São adicionadas apenas as composições válidas.
     '''
-    composicoes = request.get_json()['composicoes']
+    # composicoes = request.get_json()['composicoes']
     for nova_composicao in composicoes:
         try:
             composicao = Composicao(
@@ -96,6 +96,25 @@ def cria_composicoes(composicoes):
                 unidade=nova_composicao['unidade']
             )
             db.session.add(composicao)
+        except Exception as e:
+            print(e)
+    db.session.commit()
+
+
+def cria_subcomposicoes(subcomposicoes):
+    '''
+    Adiciona uma lista de composições ao banco de dados.
+    São adicionadas apenas as composições válidas.
+    '''
+   # composicoes = request.get_json()['composicoes']
+    for nova_subcomposicao in subcomposicoes:
+        try:
+            subcomposicao = Subcomposicao(
+                codigo=nova_subcomposicao['codigo'],
+                id_composicao=nova_subcomposicao['id_composicao'],
+                coeficiente=nova_subcomposicao['coeficiente']
+            )
+            db.session.add(subcomposicao)
         except Exception as e:
             print(e)
     db.session.commit()

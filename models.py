@@ -17,7 +17,16 @@ class Composicao(db.Model):
     unidade = db.Column(db.String, nullable=False)
     coeficiente = db.Column(db.Float, default=1.0)
 
-    composicoes = db.relationship('Subcomposicao')
+    sub_composicoes = db.relationship(
+        'Subcomposicao',
+        foreign_keys='Subcomposicao.codigo',
+        backref='composicao_filha'
+    )
+    sub_composicoes_mae = db.relationship(
+        'Subcomposicao',
+        foreign_keys='Subcomposicao.id_composicao',
+        backref='composicao_mae'
+    )
 
 
 class Subcomposicao(db.Model):
@@ -30,11 +39,26 @@ class Subcomposicao(db.Model):
     '''
     __tablename__ = 'subcomposicoes'
     # db.ForeignKey('nome_tabela.coluna')
-    codigo = db.Column(db.Integer, db.ForeignKey(
-        'composicoes.codigo'), primary_key=True)
-    id_composicao = db.Column(db.Integer, db.ForeignKey(
-        'composicoes.codigo'), primary_key=True)
+    codigo = db.Column(
+        db.Integer,
+        db.ForeignKey('composicoes.codigo'),
+        primary_key=True)
+    id_composicao = db.Column(
+        db.Integer,
+        db.ForeignKey('composicoes.codigo'),
+        primary_key=True)
     coeficiente = db.Column(db.Float, nullable=False)
+
+    # # (Opcional) acessar diretamente os objetos
+    # composicao1 = db.relationship(
+    #     'Composicao',
+    #     foreign_keys=[codigo]
+    # )
+
+    # composicao2 = db.relationship(
+    #     'Composicao',
+    #     foreign_keys=[id_composicao]
+    # )
 
 
 class Usuario(db.Model):
@@ -43,7 +67,7 @@ class Usuario(db.Model):
     A ser usado apenas para garantir que nenhum usuário poderá alterar o banco de dados de forma arbitrária
     '''
     __tablename__ = 'usuarios'
-    id = db.Column(db.Integer, primary_key=True, auto_increment=True)
+    id = db.Column(db.Integer, primary_key=True)  # , auto_increment=True)
     email = db.Column(db.String)
     password = db.Column(db.String)
     admin = db.Column(db.Boolean, default=False)
