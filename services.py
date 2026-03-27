@@ -24,7 +24,7 @@ def get_composicoes():
     return composicoes
 
 
-def get_composicoes_by_codigo(codigo):
+def get_composicao_by_codigo(codigo):
     '''
     Retorna a composição com o código fornecido.
     Caso não encontrada lança uma exceção.
@@ -48,18 +48,32 @@ def get_subcomposicoes(codigo):
     Retorna a composição com o código fornecido.
     Caso não encontrada lança uma exceção.
     '''
-    composicoes = Subcomposicao.query.filter_by(id_composicao=codigo)
-    if not composicoes:
+    pares = Subcomposicao.query.filter_by(id_composicao=codigo)
+    if not pares:
         return None
 
     subcomposicoes = []
-    for subcomposicao in subcomposicoes:
-        nova_subcomposicao = get_composicoes_by_codigo(subcomposicao.codigo)
-        # Atualiza o coeficiente da subcomposicao
-        nova_subcomposicao['coeficiente'] = subcomposicao.coeficiente
-        subcomposicoes.append()
+    for par in pares:
+        nova_subcomposicao = get_composicao_by_codigo(par.codigo)
+        if nova_subcomposicao:
+            # print(f'Antes:{nova_subcomposicao}')
+            nova_subcomposicao['coeficiente'] = par.coeficiente
+            # print(f'---\nDepois{nova_subcomposicao}')
+            subcomposicoes.append(nova_subcomposicao)
+            # print(f'{par.codigo} coeficiente = {par.coeficiente}')
+        else:
+            print(f'{par.codigo} não encontrado!')
+        # try:
+        #     if not nova_subcomposicao:
+        #         print(f'{par.codigo} não encontrado!')
+        #         continue
+        #     # Atualiza o coeficiente da subcomposicao
+        #     nova_subcomposicao['coeficiente'] = par.coeficiente
+        #     subcomposicoes.append(nova_subcomposicao)
+        # except:
+        #     print(f'{par.codigo} não encontrado!')
 
-    return nova_subcomposicao
+    return subcomposicoes
 
 
 def cria_composicao(composicao):
@@ -120,6 +134,10 @@ def cria_subcomposicoes(subcomposicoes):
     db.session.commit()
 
 
+def is_insumo(codigo: int) -> bool:
+    return Subcomposicao.query.filter_by(id_composicao=codigo).first() == None
+
+
 def altera_composicao(codigo, composicao):
     '''
     Altera as informações de uma única composição com exceção do código.
@@ -155,3 +173,24 @@ def remover_composicao(codigo):
 
     # composicoes[indice].update(composicao)
 # pprint(get_composicoes_by_codigo(104658))
+
+
+def get_subcomposicoes_completas(codigo: int = None, composicao=None):
+    if not (codigo or composicao):
+        return {}
+    if codigo:
+        composicao = get_composicao_by_codigo(codigo)
+    else:
+        codigo = composicao['codigo']
+    composicao['coeficiente'] = composicao.get('coeficiente', 1.0)
+
+    subcomposicoes = get_subcomposicoes(codigo)
+
+    lista = []
+    for subcomposicao in subcomposicoes:
+        lista.append(get_subcomposicoes_completas(composicao=subcomposicao))
+
+    return {
+        'composicao': composicao,
+        'subcomposicoes': lista
+    }

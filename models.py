@@ -17,15 +17,15 @@ class Composicao(db.Model):
     unidade = db.Column(db.String, nullable=False)
     coeficiente = db.Column(db.Float, default=1.0)
 
-    sub_composicoes = db.relationship(
-        'Subcomposicao',
-        foreign_keys='Subcomposicao.codigo',
-        backref='composicao_filha'
-    )
     sub_composicoes_mae = db.relationship(
         'Subcomposicao',
-        foreign_keys='Subcomposicao.id_composicao',
+        foreign_keys='Subcomposicao.codigo',
         backref='composicao_mae'
+    )
+    sub_composicoes = db.relationship(
+        'Subcomposicao',
+        foreign_keys='Subcomposicao.id_composicao',
+        backref='composicao_filha'
     )
 
 

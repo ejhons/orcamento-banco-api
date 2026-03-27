@@ -4,6 +4,7 @@
 from flask import Blueprint, jsonify, request
 from models import Composicao, Subcomposicao
 from extensions import db
+from services import get_subcomposicoes_completas
 # from main import db
 # import services  # import get_composicoes, get_composicoes_by_codigo, cria_composicao, altera_composicao, remover_composicao
 # app = Flask(__name__)
@@ -20,7 +21,7 @@ def obter_subcomposicoes(codigo: int):
         return jsonify({'mensagem': f'{codigo} não encontrada'}, 401)
 
     resultado = []
-    for sub in composicao.sub_composicoes_mae:
+    for sub in composicao.sub_composicoes:
         resultado.append({
             "codigo": sub.codigo,
             "coeficiente": sub.coeficiente
@@ -29,11 +30,18 @@ def obter_subcomposicoes(codigo: int):
     return jsonify({'composicao': codigo, 'subcomposicoes': resultado}, 200)
 
 
+@subcomposicao_rotas.route('/composicoes/<int:codigo>/subcomposicoes_raw', methods=['GET'])
+def obter_subcomposicoes_completas(codigo: int):
+    resultado = get_subcomposicoes_completas(codigo=codigo)
+    return jsonify(resultado, 200)
+
+
 @subcomposicao_rotas.route('/composicoes/<int:codigo>/subcomposicoes/adicionar', methods=['POST'])
 def criar_subcomposicoes_by_composicao(codigo: int):
     subcomposicoes = request.get_json()['subcomposicoes']
     for nova_sub in subcomposicoes:
         try:
+            # Retornar erro se composição principal não for localizada
             subcomposicao = Subcomposicao(
                 codigo=nova_sub['id'],
                 id_composicao=codigo,
@@ -67,7 +75,7 @@ def criar_subcomposicoes():
 
 
 @subcomposicao_rotas.route('/composicoes/<int:codigo>/subcomposicoes/<int:id_sub>', methods=['PUT'])
-def alterar_subcomposicao(codigo: int, id_sub: int):
+def alterar_coeficiente_subcomposicao(codigo: int, id_sub: int):
     # composicao_alterada = request.get_json()
     # services.altera_composicao(codigo, composicao_alterada)
     # return jsonify(composicao_alterada, 200)
@@ -93,7 +101,7 @@ def excluir_subcomposicao(codigo, id_sub):
     db.session.delete(sub_existente)
     db.session.commit()
 
-    return jsonify({'mensagem': f'subcomposição {id_sub} da composição {codigo} excluídq com sucesso!'}, 200)
+    return jsonify({'mensagem': f'subcomposição {id_sub} da composição {codigo} excluída com sucesso!'}, 200)
 
 
 @subcomposicao_rotas.route('/composicoes/<int:codigo>', methods=['DELETE'])
